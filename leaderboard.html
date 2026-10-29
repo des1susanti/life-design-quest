@@ -18,6 +18,8 @@ html,body{margin:0;height:100%;background:var(--ink);color:#fff;font-family:"Plu
 .tabs{display:flex;gap:.6vw}
 .tabs button{font:inherit;font-weight:800;font-size:1.05vw;padding:.7vw 1.3vw;border-radius:99px;border:2px solid #3A4270;background:transparent;color:#fff;cursor:pointer}
 .tabs button.on{background:var(--coral);border-color:var(--coral);color:var(--ink)}
+#snd{font:inherit;font-weight:800;font-size:1.05vw;padding:.7vw 1.1vw;border-radius:99px;border:2px solid #3A4270;background:transparent;color:#fff;cursor:pointer;margin-right:.6vw}
+#snd.on{border-color:var(--sun);color:var(--sun)}
 .view{flex:1;display:none;min-height:0}
 .view.on{display:flex}
 /* lobi */
@@ -28,8 +30,9 @@ html,body{margin:0;height:100%;background:var(--ink);color:#fff;font-family:"Plu
 .chip{background:rgba(20,27,52,.85);border-radius:99px;padding:.6vw 1.2vw;font-weight:800;font-size:1.2vw}
 .chip b{color:var(--sun)}
 .chip.stage{color:var(--teal)}
-.qrcard{right:2vw;bottom:2vh;background:#fff;color:var(--ink);border-radius:1.2vw;padding:1vw;text-align:center;box-shadow:0 1vw 3vw rgba(0,0,0,.35)}
-#qr img,#qr canvas{width:12vw!important;height:12vw!important;display:block}
+.qrcard{right:2vw;bottom:2vh;background:#fff;border-radius:1.4vw;padding:1.2vw;display:flex;align-items:center;justify-content:center;box-shadow:0 1vw 3vw rgba(0,0,0,.35)}
+#qr{display:flex;align-items:center;justify-content:center;line-height:0}
+#qr img,#qr canvas{width:13vw!important;height:13vw!important;display:block;margin:0 auto}
 .qrcard .u{font-weight:800;font-size:.95vw;margin-top:.6vw}
 .qrcard .t{font-weight:800;font-size:1.1vw;color:var(--coral)}
 .av{width:2.6vw;height:3.9vw;image-rendering:pixelated;flex:0 0 auto}
@@ -84,6 +87,7 @@ canvas#cf{position:fixed;inset:0;pointer-events:none;z-index:5}
       <button data-s="0" title="Kunci semua">🔒</button>
       <button data-s="1">1</button><button data-s="2">2</button><button data-s="3">3</button><button data-s="4">4</button><button data-s="5">5</button><button data-s="6">6</button>
     </div>
+    <button id="snd" title="Musik on/off (tombol M)">🔇 Musik</button>
     <div class="tabs">
       <button data-v="join" class="on">1 · Lobi</button>
       <button data-v="board">2 · Papan Skor</button>
@@ -98,7 +102,7 @@ canvas#cf{position:fixed;inset:0;pointer-events:none;z-index:5}
       <span class="chip">Di kampus: <b id="cnt1">0</b> · Tamat: <b id="cnt1b">0</b></span>
       <div id="warn"></div>
     </div>
-    <div class="ov qrcard"><div class="t">Scan untuk masuk!</div><div id="qr" style="margin-top:.5vw"></div><div class="u" id="url"></div></div>
+    <div class="ov qrcard"><div id="qr" title="Scan untuk masuk"></div><div id="url" hidden></div></div>
   </section>
 
   <section class="view" id="board">
@@ -120,6 +124,7 @@ canvas#cf{position:fixed;inset:0;pointer-events:none;z-index:5}
 <script src="logo.js"></script>
 <script src="chars.js"></script>
 <script src="lobby.js"></script>
+<script src="sound.js"></script>
 <script src="config.js"></script>
 <script>
 const CFG = Object.assign({SCRIPT_URL:""}, window.LDQ_CONFIG||{});
@@ -134,9 +139,12 @@ $("#mini").innerHTML = nnLogo(false);
 startLobby($("#lobbycv"), ()=>DATA.players||[]);
 
 // tabs (+ pintasan keyboard 1/2/3)
-function show(v){ document.querySelectorAll(".view").forEach(x=>x.classList.toggle("on",x.id===v)); document.querySelectorAll(".tabs button").forEach(b=>b.classList.toggle("on",b.dataset.v===v)); }
+let REVEALED=false;
+const trackFor = v => v==="join"?"lobby":v==="board"?"board":(REVEALED?"victory":"suspense");
+function show(v){ LDQ_SOUND.setTrack(trackFor(v)); document.querySelectorAll(".view").forEach(x=>x.classList.toggle("on",x.id===v)); document.querySelectorAll(".tabs button").forEach(b=>b.classList.toggle("on",b.dataset.v===v)); }
 document.querySelectorAll(".tabs button").forEach(b=>b.onclick=()=>show(b.dataset.v));
-addEventListener("keydown",e=>{ if(e.target.tagName==="INPUT") return; if(e.key==="1")show("join"); if(e.key==="2")show("board"); if(e.key==="3")show("podium"); });
+addEventListener("keydown",e=>{ if(e.target.tagName==="INPUT") return; if(e.key==="1")show("join"); if(e.key==="2")show("board"); if(e.key==="3")show("podium"); if(e.key==="m"||e.key==="M") $("#snd").click(); });
+$("#snd").onclick=()=>{ const on=LDQ_SOUND.toggle(); $("#snd").classList.toggle("on",on); $("#snd").textContent=on?"🔊 Musik":"🔇 Musik"; };
 
 // QR
 $("#url").textContent = GAME.replace(/^https?:\/\//,"");
@@ -166,9 +174,10 @@ function paint(){
   $("#grid").innerHTML = t.length ? t.map((r,i)=>`<div class="row r${i+1}" style="grid-column:${i<5?1:2};grid-row:${(i%5)+1}"><div class="rk">${i+1}</div><img class="av" alt="" src="${LDQ_CHARS.dataURL(r.char||"m1",0,4)}"><div style="min-width:0"><div class="nm">${esc(short(r.nama))}</div><div class="pr">${esc(r.prodi)}<span class="lv ${r.levels>=6?"done":""}">${r.levels>=6?"TAMAT":"Lv "+r.levels+"/6"}</span></div></div><div class="sc">${r.skor}</div></div>`).join("") : '<div class="empty">Menunggu peserta pertama menyelesaikan sesi…</div>';
   paintStage(DATA.stage||0);
 }
+let POLLED=false;
 function poll(){
   if(!CFG.SCRIPT_URL) return;
-  jsonp(CFG.SCRIPT_URL+"?action=top", d=>{ if(d&&d.ok){ DATA=d; paint(); if(!("players" in d)) $("#warn").innerHTML='<div class="warn">Skrip Google masih versi lama: tempel Code.gs terbaru lalu Deploy &gt; Manage deployments &gt; New version.</div>'; else if($("#warn").textContent.includes("versi lama")) $("#warn").innerHTML=""; $("#upd").textContent="Diperbarui "+new Date().toLocaleTimeString("id-ID"); } }, ()=>{ $("#upd").textContent="Koneksi terputus, mencoba lagi…"; });
+  jsonp(CFG.SCRIPT_URL+"?action=top", d=>{ if(d&&d.ok){ const prevTotal=DATA.total, prevTop=(DATA.top&&DATA.top[0]||{}).nama; DATA=d; paint(); if(POLLED){ if(d.total>prevTotal) LDQ_SOUND.pop(); else if(d.top&&d.top[0]&&d.top[0].nama!==prevTop) LDQ_SOUND.ding(); } POLLED=true; if(!("players" in d)) $("#warn").innerHTML='<div class="warn">Skrip Google masih versi lama: tempel Code.gs terbaru lalu Deploy &gt; Manage deployments &gt; New version.</div>'; else if($("#warn").textContent.includes("versi lama")) $("#warn").innerHTML=""; $("#upd").textContent="Diperbarui "+new Date().toLocaleTimeString("id-ID"); } }, ()=>{ $("#upd").textContent="Koneksi terputus, mencoba lagi…"; });
 }
 poll(); setInterval(poll,5000);
 
@@ -190,7 +199,8 @@ $("#reveal").onclick=()=>{
   const order=[1,0,2], h=["38vh","28vh","20vh"], c=["#FFC94D","#D7DAE8","#E8A27C"];
   $("#pods").innerHTML = order.filter(i=>t[i]).map(i=>`<div class="pod" data-i="${i}"><img class="hero" alt="" src="${LDQ_CHARS.dataURL(t[i].char||"m1",3,8)}"><div class="who">${esc(short(t[i].nama))}</div><div class="ps">${esc(t[i].prodi)}</div><div class="blk" style="height:${h[i]};background:${c[i]}"><div class="n">${i+1}</div><div class="s">${t[i].skor} poin</div></div></div>`).join("");
   $("#reveal").style.display="none";
-  [2,1,0].forEach((i,k)=>setTimeout(()=>{ const p=document.querySelector(`.pod[data-i="${i}"]`); if(p) p.classList.add("show"); if(i===0) confetti(); },600+k*1300));
+  LDQ_SOUND.setTrack("none"); LDQ_SOUND.drumroll(3.15);
+  [2,1,0].forEach((i,k)=>setTimeout(()=>{ const p=document.querySelector(`.pod[data-i="${i}"]`); if(p) p.classList.add("show"); if(i===0){ confetti(); LDQ_SOUND.fanfare(); LDQ_SOUND.applause(8); REVEALED=true; setTimeout(()=>{ if($("#podium").classList.contains("on")) LDQ_SOUND.setTrack("victory"); },5000); } else LDQ_SOUND.ding(); },600+k*1300));
 };
 function confetti(){
   const cv=$("#cf"), x=cv.getContext("2d"); cv.width=innerWidth; cv.height=innerHeight;

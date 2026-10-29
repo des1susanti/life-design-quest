@@ -41,6 +41,7 @@ Level dibuka satu per satu oleh narasumber setelah materi terkait selesai dijela
 - 🧭 **Animasi pembuka:** logo kompas yang tersusun dari jaringan neuron, dirakit dan jarumnya berayun selama ±5 detik.
 - 🧑‍🎓 **10 karakter pixel:** 5 laki-laki dan 5 perempuan (3 berhijab) yang dipilih setelah mengisi data; karakter melompat saat jawaban benar dan tercetak di sertifikat.
 - 🏫 **Lobi kampus ala ZEP:** di layar proyektor, karakter mahasiswa keluar dari gedung Perguruan Tinggi Al-Madani versi pixel lalu berjalan-jalan dengan nama dan level di atas kepala.
+- 🎵 **Musik & efek suara:** musik retro orisinal yang berbeda di Lobi, Papan Skor, dan Juara (drum roll, fanfare, tepuk tangan), dibangkitkan dengan Web Audio API tanpa file audio. Tombol 🔇/🔊 Musik atau tekan `M`.
 - 🔓 **Level dibuka bertahap:** narasumber mengklik tombol 1–6 di layar papan skor; level di HP mahasiswa terbuka otomatis.
 - 📱 **Mobile-first:** dirancang untuk layar HP, tanpa perlu instal aplikasi atau login.
 - 💾 **Progres tersimpan:** jika halaman ter-refresh, permainan berlanjut dari posisi terakhir.
@@ -54,6 +55,7 @@ Level dibuka satu per satu oleh narasumber setelah materi terkait selesai dijela
 |---|---|
 | Tampilan & logika game | HTML5, CSS3, JavaScript murni (*vanilla*, tanpa framework) |
 | Logo & animasi | SVG yang dibangkitkan dengan JavaScript + animasi CSS |
+| Musik & efek suara | Web Audio API (oscillator + noise), komposisi orisinal |
 | Karakter & lobi | Pixel art yang digambar dengan kode di HTML5 Canvas (tanpa file gambar) |
 | Pembuatan sertifikat | HTML5 Canvas API, diekspor sebagai PNG langsung di perangkat peserta |
 | Penyimpanan progres | `localStorage` browser |
@@ -74,6 +76,7 @@ life-design-quest/
 ├── logo.js            # Logo kompas neural-network (SVG + animasi)
 ├── chars.js           # 10 karakter pixel + animasinya
 ├── lobby.js           # Peta lobi kampus untuk layar proyektor
+├── sound.js           # Musik & efek suara papan skor (Web Audio API)
 ├── kampus.png         # Logo Perguruan Tinggi Al-Madani (tugu di lobi)
 ├── config.js          # Pengaturan: URL Apps Script, nama acara, narasumber
 └── README.md
