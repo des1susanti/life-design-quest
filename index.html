@@ -80,11 +80,36 @@ input[type=range]{width:100%;accent-color:var(--blue);height:28px}
 #certimg{width:100%;border-radius:10px;box-shadow:0 8px 24px rgba(0,0,0,.35);margin-top:10px}
 .small{font-size:12px;color:#B8BDD6;line-height:1.5}
 .fade{animation:fade .35s ease}
+.char-cv{image-rendering:pixelated;display:block}
+#buddy{display:inline-flex;align-items:flex-end;height:52px;margin-right:6px}
+.brandwrap{display:flex;align-items:center}
+.hero{display:flex;justify-content:center;margin:2px 0 6px}
+.pick-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-top:8px}
+.pick{background:var(--light);border:3px solid transparent;border-radius:12px;padding:6px 0 4px;cursor:pointer;display:flex;justify-content:center}
+.pick.on{border-color:var(--coral);background:#FFE7E1}
+.pick img{image-rendering:pixelated;width:44px;height:66px}
+.pickname{text-align:center;font-weight:800;color:var(--ink);margin-top:4px}
+#splash{position:fixed;inset:0;background:var(--ink);z-index:50;display:flex;flex-direction:column;align-items:center;justify-content:center;transition:opacity .6s ease}
+#splash.out{opacity:0;pointer-events:none}
+#splash .nn{width:min(72vw,300px);height:auto}
+.sp-term{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:13px;color:var(--teal);margin-top:26px;min-height:18px;white-space:pre}
+.sp-term .cur{display:inline-block;width:8px;height:15px;background:var(--coral);vertical-align:-2px;animation:blink .8s steps(1) infinite}
+@keyframes blink{50%{opacity:0}}
+.sp-title{font-weight:800;font-size:26px;letter-spacing:.5px;margin-top:10px;opacity:0;transform:translateY(8px);transition:all .6s ease}
+.sp-sub{color:#B8BDD6;font-size:14px;margin-top:4px;opacity:0;transition:opacity .6s ease .2s}
+.sp-show{opacity:1!important;transform:none!important}
+.logo-wrap{display:flex;justify-content:center;margin:4px 0 2px}
+.logo-wrap .nn{width:170px;height:170px}
+.lockmsg{background:var(--ink2);border:2px dashed #4A5280;border-radius:14px;padding:14px;margin-top:14px;text-align:center;font-weight:700;line-height:1.5}
+.lockmsg small{display:block;color:#B8BDD6;font-weight:600;margin-top:4px}
+.stagepill{display:inline-block;background:var(--ink2);color:var(--teal);font-weight:800;font-size:12px;padding:5px 10px;border-radius:99px;margin-bottom:6px}
 @keyframes fade{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
 </style>
 </head>
 <body>
 <div id="app"></div>
+<script src="logo.js"></script>
+<script src="chars.js"></script>
 <script src="config.js"></script>
 <script>
 const CFG = Object.assign({SCRIPT_URL:"",EVENT:"Career Development",SESSION:"Your Future, Your Plan",DATE:"",SPEAKER:"Desi Susanti, S.Kom., M.Kom.",SPEAKER_ROLE:"Narasumber"}, window.LDQ_CONFIG||{});
@@ -135,16 +160,18 @@ const BOSS = [
    o:[["Pakai logika dan intuisi untuk memilih, lalu jalani sepenuhnya tanpa terus menoleh ke belakang.",100,"Inilah langkah ‘Let go & move on’. Pilihan yang baik dijalani sepenuh hati."],["Tunggu dulu, siapa tahu ada tawaran ketiga yang lebih baik.",30,"Menunda terus bisa membuat kedua kesempatan hilang."],["Terima dua-duanya diam-diam.",0,"Ini merusak kepercayaan dan reputasi Salsa sejak awal."]]},
 ];
 const T_GRAV = 8, T_REF = 15; // detik
+const STAGE_OF = {l1:1,l2:1,l3:1,l4:2,l5:3,boss:4};
+const STAGE_NAME = {1:"Sesi 1",2:"Sesi 2",3:"Sesi 3",4:"Sesi 4"};
 
 // ---------------- STATE ----------------
 let S = load() || fresh();
-function fresh(){ return {step:"welcome", nama:"", nim:"", prodi:"", done:{}, pts:{}, dash:{Health:2,Work:2,Play:2,Love:2}, focus:"", l2:{i:0,score:0,order:null}, l3:{i:0,score:0,order:null}, work:[], life:[], own:"", plans:[{t:"",e:0},{t:"",e:0},{t:"",e:0}], boss:{i:0,score:0}, start:0, end:0, sent:false, rank:null, total:null}; }
+function fresh(){ return {step:"welcome", nama:"", nim:"", prodi:"", done:{}, pts:{}, dash:{Health:2,Work:2,Play:2,Love:2}, focus:"", l2:{i:0,score:0,order:null}, l3:{i:0,score:0,order:null}, work:[], life:[], own:"", plans:[{t:"",e:0},{t:"",e:0},{t:"",e:0}], boss:{i:0,score:0}, start:0, end:0, sent:false, rank:null, total:null, stage:0, char:""}; }
 function load(){ try{ return JSON.parse(localStorage.getItem(KEY)); }catch(e){ return null; } }
 function save(){ try{ localStorage.setItem(KEY, JSON.stringify(S)); }catch(e){} }
 const total = () => Object.values(S.pts).reduce((a,b)=>a+b,0);
 function go(step){ S.step = step; save(); render(); window.scrollTo(0,0); }
 function pop(txt){ const d=document.createElement("div"); d.className="pop"; d.textContent=txt; document.body.appendChild(d); setTimeout(()=>d.remove(),950); }
-function header(){ return `<div class="top"><div class="brand">LIFE DESIGN QUEST</div>${S.step!=="welcome"?`<div class="pts">⭐ <b id="ptsv">${total()}</b> poin</div>`:""}</div>`; }
+function header(){ return `<div class="top"><div class="brandwrap">${S.char&&!["welcome","pick"].includes(S.step)?`<span id="buddy"></span>`:""}<div class="brand">LIFE DESIGN QUEST</div></div>${S.step!=="welcome"?`<div class="pts">⭐ <b id="ptsv">${total()}</b> poin</div>`:""}</div>`; }
 let timerId = null;
 function stopTimer(){ if(timerId){ cancelAnimationFrame(timerId); timerId=null; } }
 
@@ -152,8 +179,10 @@ function stopTimer(){ if(timerId){ cancelAnimationFrame(timerId); timerId=null; 
 function render(){
   stopTimer();
   const app = $("#app");
-  const f = ({welcome,map,l1,l2,l3,l4,l5,boss,result,cert})[S.step] || welcome;
+  if(S.nama && !S.char && !["welcome","pick"].includes(S.step)) S.step="pick";
+  const f = ({welcome,pick,map,l1,l2,l3,l4,l5,boss,result,cert})[S.step] || welcome;
   app.innerHTML = header() + `<div class="fade">${f()}</div>`;
+  mountBuddy();
   const after = AFTER[S.step]; if(after) after();
 }
 const AFTER = {};
@@ -166,7 +195,7 @@ function dotsHTML(){
 }
 
 function welcome(){
-  return `${dotsHTML()}
+  return `<div class="logo-wrap">${nnLogo(false,170)}</div>
   <h1>Rancang masa depanmu, level demi level.</h1>
   <p>6 tantangan singkat dari sesi <b>Your Future, Your Plan</b>. Kumpulkan poin, rebut puncak papan skor, dan bawa pulang sertifikat beserta roadmap kariermu.</p>
   <div class="card">
@@ -187,24 +216,59 @@ AFTER.welcome = () => {
     if(nama.length<3) return $("#err").textContent="Isi nama lengkapmu dulu ya.";
     if(!/^[A-Za-z0-9.\-]{4,20}$/.test(nim)) return $("#err").textContent="NIM belum valid (minimal 4 karakter, tanpa spasi).";
     if(!prodi) return $("#err").textContent="Pilih program studimu.";
-    S.nama=nama; S.nim=nim; S.prodi=prodi; if(!S.start) S.start=Date.now(); go("map");
+    S.nama=nama; S.nim=nim; S.prodi=prodi; if(!S.start) S.start=Date.now(); go(S.char?"map":"pick");
   };
 };
 
+// ---- karakter
+let BUDDY=null, BUDDY_ID="", reactT=null;
+function mountBuddy(){
+  const b=$("#buddy"); if(!b||!S.char) return;
+  if(!BUDDY||BUDDY_ID!==S.char){ BUDDY=LDQ_CHARS.animated(S.char,2,"idle"); BUDDY_ID=S.char; }
+  b.appendChild(BUDDY);
+}
+function react(mode, ms){ if(!BUDDY) return; BUDDY.setMode(mode); clearTimeout(reactT); reactT=setTimeout(()=>BUDDY&&BUDDY.setMode("idle"), ms||1100); }
+function hero(mode, scale){ const h=$("#hero"); if(h&&S.char) h.appendChild(LDQ_CHARS.animated(S.char, scale||5, mode)); }
+let pickSel="";
+function pick(){
+  pickSel = pickSel || S.char || "";
+  const grp = g => LDQ_CHARS.CHARS.filter(c=>c.g===g).map(c=>`<button class="pick ${pickSel===c.id?"on":""}" data-c="${c.id}" aria-label="${esc(c.label)}"><img alt="" src="${LDQ_CHARS.dataURL(c.id,0,4)}"></button>`).join("");
+  return `<span class="tag" style="background:${COL.teal}">PILIH KARAKTER</span><h2>Siapa yang akan mewakilimu?</h2>
+  <p>Karaktermu akan muncul di layar lobi kelas dan menemanimu di setiap level.</p>
+  <div class="card"><div class="hero" id="hero" style="min-height:156px"></div><div class="pickname" id="pn">${pickSel?esc(LDQ_CHARS.CHARS.find(c=>c.id===pickSel).label):"Pilih salah satu"}</div>
+  <label>Laki-laki</label><div class="pick-grid">${grp("L")}</div>
+  <label>Perempuan</label><div class="pick-grid">${grp("P")}</div>
+  <div class="err" id="err"></div><button class="btn" id="go">Masuk ke kampus →</button></div>`;
+}
+AFTER.pick = () => {
+  const showHero=()=>{ const h=$("#hero"); h.innerHTML=""; if(pickSel) h.appendChild(LDQ_CHARS.animated(pickSel,6,"walk")); };
+  showHero();
+  document.querySelectorAll(".pick").forEach(b=>b.onclick=()=>{ pickSel=b.dataset.c; document.querySelectorAll(".pick").forEach(x=>x.classList.toggle("on",x===b)); $("#pn").textContent=LDQ_CHARS.CHARS.find(c=>c.id===pickSel).label; showHero(); });
+  $("#go").onclick=()=>{ if(!pickSel) return $("#err").textContent="Pilih satu karakter dulu ya."; S.char=pickSel; save(); submit(null,false); go("map"); };
+};
+
 function nextLevel(){ return LEVELS.find(l=>!S.done[l.id]); }
+const curStage = () => CFG.SCRIPT_URL ? (S.stage||0) : 4;
+const isOpen = l => STAGE_OF[l.id] <= curStage();
 function map(){
   const nx = nextLevel();
-  return `<h2>Hai, ${esc(S.nama.split(" ")[0])}! 👋</h2>
+  return `${CFG.SCRIPT_URL?`<span class="stagepill">● ${curStage()?STAGE_NAME[curStage()]+" dibuka":"Menunggu Sesi 1 dibuka"}</span>`:""}<div class="hero" id="hero"></div><h2>Hai, ${esc(S.nama.split(" ")[0])}! 👋</h2>
   <p>${nx?"Selesaikan level secara berurutan.":"Semua level selesai! Saatnya klaim hasilmu."}</p>
   <div class="path">${LEVELS.map(l=>{
-    const st = S.done[l.id]?"done":(nx&&nx.id===l.id?"cur":"lock");
-    return `<div class="node ${st}"><div class="badge" style="background:${l.c}">${S.done[l.id]?"✓":l.ic}</div><div><div class="t">${l.n}. ${l.t}</div><div class="s">${l.s}</div></div>${S.done[l.id]?`<div class="r">+${S.pts[l.id]||0}</div>`:""}</div>`;
+    const open = isOpen(l);
+    const st = S.done[l.id]?"done":(nx&&nx.id===l.id&&open?"cur":"lock");
+    return `<div class="node ${st}"><div class="badge" style="background:${l.c}">${S.done[l.id]?"✓":(open?l.ic:"🔒")}</div><div><div class="t">${l.n}. ${l.t}</div><div class="s">${open||S.done[l.id]?l.s:"Dibuka di "+STAGE_NAME[STAGE_OF[l.id]]}</div></div>${S.done[l.id]?`<div class="r">+${S.pts[l.id]||0}</div>`:""}</div>`;
   }).join("")}</div>
-  <button class="btn" id="go">${nx?`Main Level ${nx.n} →`:"Lihat hasil & sertifikat →"}</button>`;
+  ${nx && !isOpen(nx) ? `<div class="lockmsg">🔒 Tunggu narasumber membuka ${STAGE_NAME[STAGE_OF[nx.id]]}<small>Simak penjelasan berikutnya. Level akan terbuka otomatis di layar ini.</small></div>`
+    : `<button class="btn" id="go">${nx?`Main Level ${nx.n} →`:"Lihat hasil & sertifikat →"}</button>`}`;
 }
-AFTER.map = () => { $("#go").onclick = () => { const nx=nextLevel(); go(nx?nx.id:"result"); }; };
+AFTER.map = () => { hero(nextLevel()&&!isOpen(nextLevel())?"idle":"walk",4); const g=$("#go"); if(g) g.onclick = () => { const nx=nextLevel(); if(nx && !isOpen(nx)) return render(); go(nx?nx.id:"result"); }; };
 
-function finish(id, pts){ S.done[id]=true; S.pts[id]=pts; save(); }
+function finish(id, pts){
+  S.done[id]=true; S.pts[id]=pts; save();
+  const nx = nextLevel();
+  if(nx) submit(null, false); // kirim progres setiap level agar karakter & Lv di lobi ikut naik
+}
 
 // ---- L1 Dashboard
 const DASH = [["Health","Kesehatan tubuh & pikiran",COL.coral],["Work","Kuliah, organisasi, kerja",COL.blue],["Play","Hal yang dilakukan karena senang",COL.sun],["Love","Keluarga, sahabat, komunitas",COL.purple]];
@@ -254,7 +318,7 @@ AFTER.l2 = () => {
   const left = runTimer(T_GRAV, ()=>answer(null));
   function answer(c){
     if(answered) return; answered=true; stopTimer();
-    const ok = c===q[1]; const pts = ok? 100+Math.round(50*left()) : 0;
+    const ok = c===q[1]; const pts = ok? 100+Math.round(50*left()) : 0; react(ok?"happy":"sad");
     S.l2.score+=pts; S.l2.i++; save();
     $("#c"+q[1]).classList.add("right"); if(c && !ok) $("#c"+c).classList.add("wrong");
     $("#fbx").innerHTML=`<div class="fb ${ok?"ok":"no"}">${c===null?"⏰ Waktu habis! ":ok?"✅ Benar! ":"❌ Kurang tepat. "}${esc(q[2])}</div>
@@ -286,7 +350,7 @@ AFTER.l3 = () => {
   const left = runTimer(T_REF, ()=>answer(null));
   function answer(k){
     if(answered) return; answered=true; stopTimer();
-    const ok = k===0; const pts= ok?100+Math.round(50*left()):0;
+    const ok = k===0; const pts= ok?100+Math.round(50*left()):0; react(ok?"happy":"sad");
     S.l3.score+=pts; S.l3.i++; save();
     document.querySelectorAll(".opt").forEach(o=>{ o.disabled=true; if(+o.dataset.k===0) o.classList.add("right"); else if(+o.dataset.k===k) o.classList.add("wrong"); });
     $("#fbx").innerHTML=`<div class="fb ${ok?"ok":"no"}">${k===null?"⏰ Waktu habis! Jawaban terbaik ditandai hijau.":ok?"✅ Mantap! Begitulah cara berpikir seorang desainer.":"❌ Belum tepat. Lihat reframe yang ditandai hijau."}</div>
@@ -352,7 +416,7 @@ AFTER.boss = () => {
   const b=BOSS[S.boss.i]; let answered=false;
   document.querySelectorAll(".opt").forEach(o=>o.onclick=()=>{
     if(answered) return; answered=true; const k=+o.dataset.k, [_,pts,fb]=b.o[k];
-    S.boss.score+=pts; S.boss.i++; save();
+    S.boss.score+=pts; S.boss.i++; save(); react(pts===100?"happy":"sad");
     document.querySelectorAll(".opt").forEach(x=>{ x.disabled=true; if(b.o[+x.dataset.k][1]===100) x.classList.add("right"); });
     if(pts<100) o.classList.add("wrong");
     $("#fbx").innerHTML=`<div class="fb ${pts===100?"ok":"no"}">${pts===100?"✅":"💡"} ${esc(fb)} <b>(+${pts})</b></div><button class="btn" id="nx">Lanjut →</button>`;
@@ -372,15 +436,15 @@ function jsonp(url, cb, fail){
   setTimeout(()=>{ if(!done){ fail&&fail(); cleanup(); } },12000);
   s.src=url+(url.includes("?")?"&":"?")+"callback="+name; document.body.appendChild(s);
 }
-function submit(cb){
+function submit(cb, final){
   if(!CFG.SCRIPT_URL){ cb&&cb(false); return; }
-  const d={nama:S.nama,nim:S.nim,prodi:S.prodi,skor:total(),durasi:Math.round((S.end-S.start)/1000),kode:certCode(),kompas:kompasText(),planA:S.plans[0].t,planB:S.plans[1].t,planC:S.plans[2].t,dashboard:JSON.stringify(S.dash),fokus:S.focus};
-  jsonp(CFG.SCRIPT_URL+"?action=submit&d="+encodeURIComponent(JSON.stringify(d)), r=>{ if(r&&r.ok){ S.sent=true; S.rank=r.rank; S.total=r.total; save(); } cb&&cb(!!(r&&r.ok)); }, ()=>cb&&cb(false));
+  const d={nama:S.nama,nim:S.nim,prodi:S.prodi,skor:total(),levels:Object.keys(S.done).length,durasi:Math.round(((S.end||Date.now())-S.start)/1000),kode:certCode(),kompas:kompasText(),planA:S.plans[0].t,planB:S.plans[1].t,planC:S.plans[2].t,dashboard:JSON.stringify(S.dash),fokus:S.focus,char:S.char||"m1"};
+  jsonp(CFG.SCRIPT_URL+"?action=submit&d="+encodeURIComponent(JSON.stringify(d)), r=>{ if(r&&r.ok){ if(final!==false) S.sent=true; S.rank=r.rank; S.total=r.total; save(); } cb&&cb(!!(r&&r.ok)); }, ()=>cb&&cb(false));
 }
 function fmtDur(sec){ const m=Math.floor(sec/60), s=sec%60; return `${m} menit ${s} detik`; }
 function result(){
   if(!S.end){ S.end=Date.now(); save(); }
-  return `<span class="tag" style="background:${COL.sun}">QUEST SELESAI 🎉</span><h1>Selamat, ${esc(S.nama.split(" ")[0])}!</h1>
+  return `<span class="tag" style="background:${COL.sun}">QUEST SELESAI 🎉</span><div class="hero" id="hero"></div><h1 style="text-align:center">Selamat, ${esc(S.nama.split(" ")[0])}!</h1>
   <div class="card" style="text-align:center"><div class="small" style="color:var(--muted);font-weight:700">TOTAL POIN</div><div class="big">${total()}</div>
   <div id="rankbox" class="small" style="color:var(--muted);font-weight:700">${CFG.SCRIPT_URL?"Mengirim skor ke papan…":"Mode offline: skor tidak dikirim ke papan."}</div></div>
   <div class="card">${LEVELS.map(l=>`<div class="rowstat"><span>${l.ic} ${l.t}</span><span>+${S.pts[l.id]||0}</span></div>`).join("")}
@@ -388,6 +452,7 @@ function result(){
   <button class="btn" id="go">Ambil sertifikatku 🏅</button>`;
 }
 AFTER.result = () => {
+  hero("happy",5);
   const showRank=()=>{ const rb=$("#rankbox"); if(!rb) return; if(S.sent) rb.innerHTML = S.rank?`🏆 Peringkat <b style="color:var(--ink)">#${S.rank}</b> dari ${S.total} peserta. Lihat papan skor di layar!`:"Skor terkirim. Lihat papan skor di layar!"; };
   if(CFG.SCRIPT_URL){ if(S.sent) showRank(); else submit(ok=>{ if(ok) showRank(); else { const rb=$("#rankbox"); if(rb) rb.innerHTML=`Gagal mengirim skor. <a href="#" id="retry" style="color:var(--blue)">Coba lagi</a>`; const r=$("#retry"); if(r) r.onclick=e=>{ e.preventDefault(); rb.textContent="Mengirim ulang…"; submit(ok2=>ok2?showRank():rb.textContent="Masih gagal. Cek koneksi internetmu."); }; } }); }
   $("#go").onclick=()=>go("cert");
@@ -426,8 +491,9 @@ async function drawCert(){
   let seed=7; const rnd=()=>{seed=(seed*9301+49297)%233280;return seed/233280;}; const cs=[COL.coral,COL.sun,COL.teal,COL.blue,COL.purple,"#FFFFFF"];
   for(let i=0;i<420;i++){ const a=rnd()*Math.PI*2, r=150+rnd()*95, s=4+rnd()*9; x.globalAlpha=.55+rnd()*.45; x.fillStyle=cs[Math.floor(rnd()*6)]; x.beginPath(); x.arc(320+Math.cos(a)*r,400+Math.sin(a)*r,s,0,7); x.fill(); }
   x.globalAlpha=1;
-  x.fillStyle=COL.coral; x.beginPath(); x.arc(320,400,96,0,7); x.fill();
-  x.fillStyle=COL.ink; x.font=`800 110px ${F}`; x.textAlign="center"; x.textBaseline="middle"; x.fillText("★",320,404);
+  x.fillStyle=COL.coral; x.beginPath(); x.arc(320,400,120,0,7); x.fill();
+  x.imageSmoothingEnabled=false; const sp=LDQ_CHARS.canvasFor(S.char||"m1",3,9); x.drawImage(sp,320-sp.width/2,400-sp.height/2+6); x.imageSmoothingEnabled=true;
+  x.textAlign="center";
   x.textBaseline="alphabetic";
   x.fillStyle=COL.sun; x.font=`800 30px ${F}`; x.fillText("CERTIFIED",320,760);
   x.fillStyle="#FFFFFF"; x.font=`800 50px ${F}`; x.fillText("Life Designer",320,822);
@@ -474,7 +540,29 @@ function roundRect(x,a,b,w,h,r){ x.beginPath(); x.moveTo(a+r,b); x.arcTo(a+w,b,a
 
 // Reset tersembunyi untuk narasumber/panitia: tambahkan ?reset=1 di URL
 if(new URLSearchParams(location.search).get("reset")==="1"){ try{ localStorage.removeItem(KEY); }catch(e){} S=fresh(); history.replaceState(null,"",location.pathname); }
+// ---- polling sesi dari narasumber
+function pollStage(){
+  if(!CFG.SCRIPT_URL || S.step!=="map") return;
+  jsonp(CFG.SCRIPT_URL+"?action=stage", r=>{
+    if(!r||!r.ok) return; const before=curStage(); S.stage=r.stage; save();
+    if(r.stage!==before && S.step==="map"){ render(); if(r.stage>before){ pop("🔓 Terbuka!"); try{navigator.vibrate&&navigator.vibrate(200);}catch(e){} } }
+  });
+}
+setInterval(pollStage, 4000);
+
+// ---- layar pembuka (±5 detik)
+function splash(ms){
+  const sp=document.createElement("div"); sp.id="splash";
+  sp.innerHTML=nnLogo(true)+'<div class="sp-term" id="spt"></div><div class="sp-title">LIFE DESIGN QUEST</div><div class="sp-sub">Your Future, Your Plan</div>';
+  document.body.appendChild(sp);
+  const cmd="$ ./life-design-quest --start", el=sp.querySelector("#spt"); let i=0;
+  const typer=setInterval(()=>{ i++; el.innerHTML=esc(cmd.slice(0,i))+'<span class="cur"></span>'; if(i>=cmd.length) clearInterval(typer); }, Math.max(25,(ms*0.45)/cmd.length));
+  setTimeout(()=>{ sp.querySelector(".sp-title").classList.add("sp-show"); sp.querySelector(".sp-sub").classList.add("sp-show"); }, ms*0.62);
+  setTimeout(()=>{ sp.classList.add("out"); setTimeout(()=>sp.remove(),650); }, ms);
+}
 render();
+splash(S.nama ? 2500 : 5000);
+pollStage();
 </script>
 </body>
 </html>

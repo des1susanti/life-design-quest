@@ -11,34 +11,40 @@
 :root{--ink:#141B34;--ink2:#232B52;--coral:#FF6B4A;--sun:#FFC94D;--teal:#2EC4B6;--blue:#4D7CFE;--purple:#9B5DE5;--muted:#B8BDD6}
 *{box-sizing:border-box}
 html,body{margin:0;height:100%;background:var(--ink);color:#fff;font-family:"Plus Jakarta Sans",system-ui,sans-serif;overflow:hidden}
-.wrap{height:100vh;display:flex;flex-direction:column;padding:3.5vh 4vw}
+.wrap{height:100vh;display:flex;flex-direction:column;padding:3.5vh 4vw 8vh}
 .top{display:flex;align-items:center;justify-content:space-between}
-.brand{font-weight:800;color:var(--sun);letter-spacing:.2vw;font-size:1.6vw}
+.brand{display:flex;align-items:center;gap:.8vw;font-weight:800;color:var(--sun);letter-spacing:.2vw;font-size:1.5vw}
+.brand .nn{width:3.2vw;height:3.2vw}
 .tabs{display:flex;gap:.6vw}
 .tabs button{font:inherit;font-weight:800;font-size:1.05vw;padding:.7vw 1.3vw;border-radius:99px;border:2px solid #3A4270;background:transparent;color:#fff;cursor:pointer}
 .tabs button.on{background:var(--coral);border-color:var(--coral);color:var(--ink)}
 .view{flex:1;display:none;min-height:0}
 .view.on{display:flex}
-/* join */
-#join{align-items:center;gap:5vw}
-#join .l{flex:1}
-#join h1{font-size:5.2vw;line-height:1.05;margin:0 0 2vh;font-weight:800}
-#join h1 span{color:var(--coral)}
-#join p{font-size:1.7vw;color:var(--muted);margin:0 0 3vh;line-height:1.4}
-.url{display:inline-block;background:var(--ink2);padding:1vw 1.6vw;border-radius:1vw;font-size:1.6vw;font-weight:700;color:var(--teal)}
-.qrbox{background:#fff;padding:2vw;border-radius:2vw;box-shadow:0 2vw 5vw rgba(0,0,0,.4)}
-#qr img,#qr canvas{width:30vw!important;height:30vw!important;max-width:58vh;max-height:58vh;display:block}
-.count{margin-top:3vh;font-size:1.6vw;font-weight:700}
-.count b{color:var(--sun);font-size:2.4vw}
+/* lobi */
+#join{position:relative;margin:1.5vh -4vw 0;border-radius:0;overflow:hidden}
+#lobbycv{position:absolute;inset:0;width:100%;height:100%;display:block}
+.ov{position:absolute;z-index:2}
+.ov-l{left:2vw;bottom:2vh;display:flex;flex-direction:column;gap:1vh;align-items:flex-start}
+.chip{background:rgba(20,27,52,.85);border-radius:99px;padding:.6vw 1.2vw;font-weight:800;font-size:1.2vw}
+.chip b{color:var(--sun)}
+.chip.stage{color:var(--teal)}
+.qrcard{right:2vw;bottom:2vh;background:#fff;color:var(--ink);border-radius:1.2vw;padding:1vw;text-align:center;box-shadow:0 1vw 3vw rgba(0,0,0,.35)}
+#qr img,#qr canvas{width:12vw!important;height:12vw!important;display:block}
+.qrcard .u{font-weight:800;font-size:.95vw;margin-top:.6vw}
+.qrcard .t{font-weight:800;font-size:1.1vw;color:var(--coral)}
+.av{width:2.6vw;height:3.9vw;image-rendering:pixelated;flex:0 0 auto}
+.pod .hero{height:15vh;image-rendering:pixelated;display:block;margin:0 auto 1vh}
 /* board */
 #board{flex-direction:column;padding-top:2vh}
 #board h2{font-size:2.6vw;margin:0 0 2vh;font-weight:800}
-.grid{display:grid;grid-template-columns:1fr 1fr;gap:1.2vh 2vw;flex:1;align-content:start}
-.row{display:flex;align-items:center;gap:1.2vw;background:var(--ink2);border-radius:1.2vw;padding:1.3vh 1.4vw;transition:transform .4s}
+.grid{display:grid;grid-template-columns:1fr 1fr;grid-template-rows:repeat(5,auto);gap:1.2vh 2vw;flex:1;align-content:start}
+.row{display:flex;align-items:center;gap:1.2vw;background:var(--ink2);border-radius:1.2vw;padding:1.3vh 1.4vw}
 .rk{width:3.6vw;height:3.6vw;border-radius:50%;display:grid;place-items:center;font-weight:800;font-size:1.6vw;color:var(--ink);background:#3A4270;flex:0 0 auto}
 .r1 .rk{background:var(--sun)}.r2 .rk{background:#D7DAE8}.r3 .rk{background:#E8A27C}
 .nm{font-weight:800;font-size:1.65vw;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .pr{font-size:1.05vw;color:var(--muted);font-weight:600}
+.lv{display:inline-block;margin-left:.5vw;padding:.1vw .6vw;border-radius:99px;background:#3A4270;color:#fff;font-size:.95vw;font-weight:800}
+.lv.done{background:var(--teal);color:var(--ink)}
 .sc{margin-left:auto;font-weight:800;font-size:2vw;color:var(--sun)}
 .empty{font-size:1.8vw;color:var(--muted)}
 .foot{display:flex;justify-content:space-between;color:var(--muted);font-size:1.05vw;margin-top:1.5vh}
@@ -58,36 +64,44 @@ html,body{margin:0;height:100%;background:var(--ink);color:#fff;font-family:"Plu
 #reveal{font:inherit;font-weight:800;font-size:1.4vw;padding:1vw 2.2vw;border-radius:99px;border:0;background:var(--coral);color:var(--ink);cursor:pointer;margin-top:3vh}
 canvas#cf{position:fixed;inset:0;pointer-events:none;z-index:5}
 .warn{background:#5A2330;color:#FFD6D8;padding:1vw 1.4vw;border-radius:1vw;font-size:1.2vw;margin-top:2vh}
+/* kontrol narasumber */
+.ctl{position:fixed;right:1.5vw;bottom:1.5vh;z-index:6;display:flex;align-items:center;gap:.5vw;background:rgba(35,43,82,.92);border:1px solid #3A4270;padding:.5vw .7vw;border-radius:99px;opacity:.35;transition:opacity .2s}
+.ctl:hover{opacity:1}
+.ctl span{font-size:.9vw;font-weight:700;color:var(--muted);margin:0 .3vw}
+.ctl button{font:inherit;font-weight:800;font-size:.95vw;min-width:2.4vw;padding:.4vw .7vw;border-radius:99px;border:1px solid #4A5280;background:transparent;color:#fff;cursor:pointer}
+.ctl button.on{background:var(--teal);border-color:var(--teal);color:var(--ink)}
+.toast{pointer-events:none;position:fixed;left:50%;bottom:8vh;transform:translateX(-50%);background:var(--teal);color:var(--ink);font-weight:800;font-size:1.4vw;padding:1vw 2vw;border-radius:99px;z-index:7;opacity:0;transition:opacity .3s}
+.toast.show{opacity:1}
+.toast.bad{background:var(--coral)}
 </style>
 </head>
 <body>
 <canvas id="cf"></canvas>
 <div class="wrap">
   <div class="top">
-    <div class="brand">LIFE DESIGN QUEST · PAPAN SKOR</div>
+    <div class="brand"><span id="mini"></span>LIFE DESIGN QUEST · PAPAN SKOR</div>
     <div class="tabs">
-      <button data-v="join" class="on">1 · Scan QR</button>
+      <button data-v="join" class="on">1 · Lobi</button>
       <button data-v="board">2 · Papan Skor</button>
       <button data-v="podium">3 · Juara 🏆</button>
     </div>
   </div>
 
   <section class="view on" id="join">
-    <div class="l">
-      <h1>Scan, main,<br><span>raih sertifikatmu!</span></h1>
-      <p>Buka kamera HP, scan kode QR, lalu selesaikan 6 level Life Design Quest. Nama terbaik akan muncul di layar ini.</p>
-      <div class="url" id="url"></div>
-      <div class="count">Sudah selesai: <b id="cnt1">0</b> peserta</div>
+    <canvas id="lobbycv"></canvas>
+    <div class="ov ov-l">
+      <span class="chip stage" id="stageNow">Menunggu Sesi 1 dibuka</span>
+      <span class="chip">Di kampus: <b id="cnt1">0</b> · Tamat: <b id="cnt1b">0</b></span>
       <div id="warn"></div>
     </div>
-    <div class="qrbox"><div id="qr"></div></div>
+    <div class="ov qrcard"><div class="t">Scan untuk masuk!</div><div id="qr" style="margin-top:.5vw"></div><div class="u" id="url"></div></div>
   </section>
 
   <section class="view" id="board">
     <h2>🔥 10 Life Designer Teratas</h2>
-    <div class="grid" id="grid"><div class="empty">Menunggu peserta pertama menyelesaikan quest…</div></div>
+    <div class="grid" id="grid"><div class="empty">Menunggu peserta pertama menyelesaikan sesi…</div></div>
     <div class="prog"><i id="pbar" style="width:0%"></i></div>
-    <div class="foot"><span id="cnt2">0 peserta selesai</span><span id="upd">Memperbarui otomatis setiap 5 detik</span></div>
+    <div class="foot"><span id="cnt2">0 peserta bermain</span><span id="upd">Memperbarui otomatis setiap 5 detik</span></div>
   </section>
 
   <section class="view" id="podium">
@@ -97,40 +111,61 @@ canvas#cf{position:fixed;inset:0;pointer-events:none;z-index:5}
   </section>
 </div>
 
+<div class="ctl" id="ctl" title="Kontrol narasumber (PIN)">
+  <span>SESI</span>
+  <button data-s="0" title="Kunci semua">🔒</button>
+  <button data-s="1">1</button><button data-s="2">2</button><button data-s="3">3</button><button data-s="4">4</button>
+</div>
+<div class="toast" id="toast"></div>
+
+<script src="logo.js"></script>
+<script src="chars.js"></script>
+<script src="lobby.js"></script>
 <script src="config.js"></script>
 <script>
-const CFG = Object.assign({SCRIPT_URL:"",EXPECTED:45}, window.LDQ_CONFIG||{});
+const CFG = Object.assign({SCRIPT_URL:""}, window.LDQ_CONFIG||{});
 const $ = s => document.querySelector(s);
 const esc = s => String(s==null?"":s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const qp = new URLSearchParams(location.search);
-const GAME = qp.get("game") || location.href.split("?")[0].split("#")[0].replace(/leaderboard\.html$/,"") ;
-let DATA = {top:[],total:0};
+const GAME = qp.get("game") || location.href.split("?")[0].split("#")[0].replace(/leaderboard\.html$/,"");
+const STAGE_TXT = {0:"Menunggu Sesi 1 dibuka",1:"Sesi 1 dibuka · Level 1–3",2:"Sesi 2 dibuka · Level 4 Kompas",3:"Sesi 3 dibuka · Level 5 Odyssey",4:"Sesi 4 dibuka · Boss Level"};
+let DATA = {top:[],total:0,finished:0,stage:0};
 
-// tabs (+ shortcut keyboard 1/2/3)
+$("#mini").innerHTML = nnLogo(false);
+startLobby($("#lobbycv"), ()=>DATA.players||[]);
+
+// tabs (+ pintasan keyboard 1/2/3)
 function show(v){ document.querySelectorAll(".view").forEach(x=>x.classList.toggle("on",x.id===v)); document.querySelectorAll(".tabs button").forEach(b=>b.classList.toggle("on",b.dataset.v===v)); }
 document.querySelectorAll(".tabs button").forEach(b=>b.onclick=()=>show(b.dataset.v));
-addEventListener("keydown",e=>{ if(e.key==="1")show("join"); if(e.key==="2")show("board"); if(e.key==="3")show("podium"); });
+addEventListener("keydown",e=>{ if(e.target.tagName==="INPUT") return; if(e.key==="1")show("join"); if(e.key==="2")show("board"); if(e.key==="3")show("podium"); });
 
 // QR
 $("#url").textContent = GAME.replace(/^https?:\/\//,"");
-try{ new QRCode($("#qr"),{text:GAME,width:600,height:600,colorDark:"#141B34",colorLight:"#ffffff",correctLevel:QRCode.CorrectLevel.M}); }
+try{ new QRCode($("#qr"),{text:GAME,width:400,height:400,colorDark:"#141B34",colorLight:"#ffffff",correctLevel:QRCode.CorrectLevel.M}); }
 catch(e){ const im=new Image(); im.alt="QR ke game"; im.src="https://api.qrserver.com/v1/create-qr-code/?size=600x600&margin=0&data="+encodeURIComponent(GAME); $("#qr").appendChild(im); }
 if(!CFG.SCRIPT_URL) $("#warn").innerHTML='<div class="warn">SCRIPT_URL di config.js belum diisi, jadi papan skor belum terhubung ke Google Sheets.</div>';
 
 // data
+let jn=0;
 function jsonp(url, cb, fail){
-  const name="lbcb"+Date.now(); const s=document.createElement("script"); let done=false;
+  const name="lbcb"+Date.now()+"_"+(jn++); const s=document.createElement("script"); let done=false;
   window[name]=d=>{ done=true; cb(d); s.remove(); delete window[name]; };
-  s.onerror=()=>{ if(!done){ fail&&fail(); s.remove(); } };
-  setTimeout(()=>{ if(!done){ fail&&fail(); s.remove(); } },10000);
+  s.onerror=()=>{ if(!done){ done=true; fail&&fail(); s.remove(); } };
+  setTimeout(()=>{ if(!done){ done=true; fail&&fail(); s.remove(); } },10000);
   s.src=url+(url.includes("?")?"&":"?")+"callback="+name; document.body.appendChild(s);
 }
 const short = n => { const p=String(n).trim().split(/\s+/); return p.length>2? p.slice(0,2).join(" ")+" "+p[2][0]+"." : p.join(" "); };
+function paintStage(st){
+  $("#stageNow").textContent = STAGE_TXT[st]||STAGE_TXT[0];
+  document.querySelectorAll(".ctl button").forEach(b=>b.classList.toggle("on",+b.dataset.s===st));
+}
 function paint(){
   const t=DATA.top||[];
-  $("#cnt1").textContent=DATA.total; $("#cnt2").textContent=`${DATA.total} dari ±${CFG.EXPECTED} peserta selesai`;
-  $("#pbar").style.width=Math.min(100,DATA.total/CFG.EXPECTED*100)+"%";
-  $("#grid").innerHTML = t.length ? t.map((r,i)=>`<div class="row r${i+1}" style="grid-column:${i<5?1:2};grid-row:${(i%5)+1}"><div class="rk">${i+1}</div><div style="min-width:0"><div class="nm">${esc(short(r.nama))}</div><div class="pr">${esc(r.prodi)} · ${Math.floor(r.durasi/60)}m ${r.durasi%60}d</div></div><div class="sc">${r.skor}</div></div>`).join("") : '<div class="empty">Menunggu peserta pertama menyelesaikan quest…</div>';
+  $("#cnt1").textContent=DATA.total; $("#cnt1b").textContent=DATA.finished||0;
+  $("#cnt2").textContent=`${DATA.total} peserta bermain · ${DATA.finished||0} sudah tamat`;
+  $("#pbar").style.width=(DATA.total?Math.min(100,(DATA.finished||0)/DATA.total*100):0)+"%";
+  $("#grid").innerHTML = t.length ? t.map((r,i)=>`<div class="row r${i+1}" style="grid-column:${i<5?1:2};grid-row:${(i%5)+1}"><div class="rk">${i+1}</div><img class="av" alt="" src="${LDQ_CHARS.dataURL(r.char||"m1",0,4)}"><div style="min-width:0"><div class="nm">${esc(short(r.nama))}</div><div class="pr">${esc(r.prodi)}<span class="lv ${r.levels>=6?"done":""}">${r.levels>=6?"TAMAT":"Lv "+r.levels+"/6"}</span></div></div><div class="sc">${r.skor}</div></div>`).join("") : '<div class="empty">Menunggu peserta pertama menyelesaikan sesi…</div>';
+  paintStage(DATA.stage||0);
 }
 function poll(){
   if(!CFG.SCRIPT_URL) return;
@@ -138,11 +173,24 @@ function poll(){
 }
 poll(); setInterval(poll,5000);
 
+// kontrol sesi narasumber
+function toast(msg,bad){ const t=$("#toast"); t.textContent=msg; t.className="toast show"+(bad?" bad":""); clearTimeout(t._h); t._h=setTimeout(()=>t.className="toast",2600); }
+document.querySelectorAll(".ctl button").forEach(b=>b.onclick=()=>{
+  if(!CFG.SCRIPT_URL) return toast("SCRIPT_URL belum diisi",true);
+  let pin=null; try{ pin=sessionStorage.getItem("ldq_pin"); }catch(e){}
+  if(!pin){ pin=prompt("PIN narasumber:"); if(!pin) return; }
+  const st=+b.dataset.s;
+  jsonp(CFG.SCRIPT_URL+"?action=setStage&stage="+st+"&pin="+encodeURIComponent(pin), r=>{
+    if(r&&r.ok){ try{ sessionStorage.setItem("ldq_pin",pin); }catch(e){} DATA.stage=r.stage; paintStage(r.stage); toast(r.stage?`🔓 ${STAGE_TXT[r.stage]}`:"🔒 Semua level dikunci"); }
+    else { try{ sessionStorage.removeItem("ldq_pin"); }catch(e){} toast((r&&r.error)||"Gagal mengubah sesi",true); }
+  }, ()=>toast("Koneksi gagal, coba lagi",true));
+});
+
 // podium
 $("#reveal").onclick=()=>{
   const t=(DATA.top||[]).slice(0,3); if(!t.length){ $("#pods").innerHTML='<div class="empty">Belum ada peserta.</div>'; return; }
   const order=[1,0,2], h=["38vh","28vh","20vh"], c=["#FFC94D","#D7DAE8","#E8A27C"];
-  $("#pods").innerHTML = order.filter(i=>t[i]).map(i=>`<div class="pod" data-i="${i}"><div class="who">${esc(short(t[i].nama))}</div><div class="ps">${esc(t[i].prodi)}</div><div class="blk" style="height:${h[i]};background:${c[i]}"><div class="n">${i+1}</div><div class="s">${t[i].skor} poin</div></div></div>`).join("");
+  $("#pods").innerHTML = order.filter(i=>t[i]).map(i=>`<div class="pod" data-i="${i}"><img class="hero" alt="" src="${LDQ_CHARS.dataURL(t[i].char||"m1",3,8)}"><div class="who">${esc(short(t[i].nama))}</div><div class="ps">${esc(t[i].prodi)}</div><div class="blk" style="height:${h[i]};background:${c[i]}"><div class="n">${i+1}</div><div class="s">${t[i].skor} poin</div></div></div>`).join("");
   $("#reveal").style.display="none";
   [2,1,0].forEach((i,k)=>setTimeout(()=>{ const p=document.querySelector(`.pod[data-i="${i}"]`); if(p) p.classList.add("show"); if(i===0) confetti(); },600+k*1300));
 };
