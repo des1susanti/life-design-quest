@@ -461,16 +461,34 @@ AFTER.result = () => {
 // ---------------- CERTIFICATE ----------------
 function cert(){
   return `<h2>Sertifikatmu 🏅</h2><p>Unduh atau tekan lama gambar untuk menyimpannya di HP.</p>
-  <img id="certimg" alt="Sertifikat Life Design Quest atas nama ${esc(S.nama)}">
-  <button class="btn" id="dl">Unduh sertifikat (PNG)</button>
+  <div id="certwait" class="card" style="text-align:center;font-weight:700">⏳ Menyiapkan sertifikat…</div>
+  <img id="certimg" alt="Sertifikat Life Design Quest atas nama ${esc(S.nama)}" style="display:none">
+  <button class="btn" id="dl" disabled>Simpan sertifikat</button>
   <button class="btn ghost" id="back">← Kembali ke hasil</button>
   <p class="small" style="margin-top:16px">Kode verifikasi: <b>${certCode()}</b>. Simpan baik-baik, ya.</p>`;
 }
+let CERT=null; // {key, blob, url} disimpan di memori agar tidak digambar ulang
 AFTER.cert = async () => {
-  const url = await drawCert();
-  $("#certimg").src=url;
-  $("#dl").onclick=()=>{ const a=document.createElement("a"); a.href=url; a.download=`Sertifikat_LDQ_${S.nim}.png`; document.body.appendChild(a); a.click(); a.remove(); };
   $("#back").onclick=()=>go("result");
+  const key=[S.nama,S.nim,total(),S.rank,S.char].join("|");
+  if(!CERT||CERT.key!==key){
+    const cv=await drawCert();
+    const blob=await new Promise(r=>cv.toBlob(r,"image/jpeg",0.92));
+    if(CERT) URL.revokeObjectURL(CERT.url);
+    CERT={key, blob, url:URL.createObjectURL(blob)};
+  }
+  if(!$("#certimg")) return;
+  $("#certimg").src=CERT.url; $("#certimg").style.display="block"; $("#certwait").remove();
+  const fname=`Sertifikat_LDQ_${S.nim}.jpg`;
+  $("#dl").disabled=false;
+  $("#dl").onclick=async()=>{
+    const file=new File([CERT.blob],fname,{type:"image/jpeg"});
+    // HP: buka menu berbagi (Simpan Gambar / kirim WA). Laptop: unduh biasa.
+    if(navigator.canShare && navigator.canShare({files:[file]})){
+      try{ await navigator.share({files:[file],title:"Sertifikat Life Design Quest"}); return; }catch(e){ if(e&&e.name==="AbortError") return; }
+    }
+    const a=document.createElement("a"); a.href=CERT.url; a.download=fname; document.body.appendChild(a); a.click(); a.remove();
+  };
 };
 function wrap(ctx, text, x, y, maxW, lh, maxLines){
   const words=text.split(" "); let line="", lines=[];
@@ -481,7 +499,8 @@ function wrap(ctx, text, x, y, maxW, lh, maxLines){
 }
 function fitFont(ctx, text, weight, size, maxW, family){ let s=size; do{ ctx.font=`${weight} ${s}px ${family}`; s-=2; }while(ctx.measureText(text).width>maxW && s>20); }
 async function drawCert(){
-  try{ await document.fonts.load('800 40px "Plus Jakarta Sans"'); await document.fonts.load('400 20px "Plus Jakarta Sans"'); await document.fonts.ready; }catch(e){}
+  // tunggu font maksimal 1,5 detik agar tidak macet di jaringan lambat
+  try{ await Promise.race([Promise.all([document.fonts.load('800 40px "Plus Jakarta Sans"'),document.fonts.load('400 20px "Plus Jakarta Sans"')]), new Promise(r=>setTimeout(r,1500))]); }catch(e){}
   const F='"Plus Jakarta Sans", system-ui, sans-serif';
   const W=2000,H=1414, c=document.createElement("canvas"); c.width=W; c.height=H; const x=c.getContext("2d");
   // background
@@ -534,8 +553,9 @@ async function drawCert(){
   x.fillStyle=COL.ink; x.font=`800 30px ${F}`; x.textAlign="right"; x.fillText(CFG.SPEAKER,R,sy);
   x.fillStyle=COL.muted; x.font=`400 26px ${F}`; x.fillText(CFG.SPEAKER_ROLE,R,sy+40);
   x.textAlign="left"; x.fillStyle=COL.muted; x.font=`400 22px ${F}`; x.fillText(new Date(S.end||Date.now()).toLocaleDateString("id-ID",{day:"numeric",month:"long",year:"numeric"}),L,sy+40);
-  return c.toDataURL("image/png");
+  return c;
 }
+function roundRect(x,a,b,w,h,r){ x.beginPath(); x.moveTo(a+r,b); x.arcTo(a+w,b,a+w,b+h,r); x.arcTo(a+w,b+h,a,b+h,r); x.arcTo(a,b+h,a,b,r); x.arcTo(a,b,a+w,b,r); x.closePath(); }
 function roundRect(x,a,b,w,h,r){ x.beginPath(); x.moveTo(a+r,b); x.arcTo(a+w,b,a+w,b+h,r); x.arcTo(a+w,b+h,a,b+h,r); x.arcTo(a,b+h,a,b,r); x.arcTo(a,b,a+w,b,r); x.closePath(); }
 
 // Reset tersembunyi untuk narasumber/panitia: tambahkan ?reset=1 di URL
