@@ -11,7 +11,7 @@
 :root{--ink:#141B34;--ink2:#232B52;--coral:#FF6B4A;--sun:#FFC94D;--teal:#2EC4B6;--blue:#4D7CFE;--purple:#9B5DE5;--muted:#B8BDD6}
 *{box-sizing:border-box}
 html,body{margin:0;height:100%;background:var(--ink);color:#fff;font-family:"Plus Jakarta Sans",system-ui,sans-serif;overflow:hidden}
-.wrap{height:100vh;display:flex;flex-direction:column;padding:3.5vh 4vw 8vh}
+.wrap{height:100vh;display:flex;flex-direction:column;padding:3.5vh 4vw 3.5vh}
 .top{display:flex;align-items:center;justify-content:space-between}
 .brand{display:flex;align-items:center;gap:.8vw;font-weight:800;color:var(--sun);letter-spacing:.2vw;font-size:1.5vw}
 .brand .nn{width:3.2vw;height:3.2vw}
@@ -65,8 +65,7 @@ html,body{margin:0;height:100%;background:var(--ink);color:#fff;font-family:"Plu
 canvas#cf{position:fixed;inset:0;pointer-events:none;z-index:5}
 .warn{background:#5A2330;color:#FFD6D8;padding:1vw 1.4vw;border-radius:1vw;font-size:1.2vw;margin-top:2vh}
 /* kontrol narasumber */
-.ctl{position:fixed;right:1.5vw;bottom:1.5vh;z-index:6;display:flex;align-items:center;gap:.5vw;background:rgba(35,43,82,.92);border:1px solid #3A4270;padding:.5vw .7vw;border-radius:99px;opacity:.35;transition:opacity .2s}
-.ctl:hover{opacity:1}
+.ctl{display:flex;align-items:center;gap:.4vw;background:var(--ink2);border:1px solid #3A4270;padding:.4vw .6vw;border-radius:99px;margin-left:auto;margin-right:1.2vw}
 .ctl span{font-size:.9vw;font-weight:700;color:var(--muted);margin:0 .3vw}
 .ctl button{font:inherit;font-weight:800;font-size:.95vw;min-width:2.4vw;padding:.4vw .7vw;border-radius:99px;border:1px solid #4A5280;background:transparent;color:#fff;cursor:pointer}
 .ctl button.on{background:var(--teal);border-color:var(--teal);color:var(--ink)}
@@ -80,6 +79,11 @@ canvas#cf{position:fixed;inset:0;pointer-events:none;z-index:5}
 <div class="wrap">
   <div class="top">
     <div class="brand"><span id="mini"></span>LIFE DESIGN QUEST · PAPAN SKOR</div>
+    <div class="ctl" id="ctl" title="Kontrol narasumber (PIN)">
+      <span>BUKA SESI</span>
+      <button data-s="0" title="Kunci semua">🔒</button>
+      <button data-s="1">1</button><button data-s="2">2</button><button data-s="3">3</button><button data-s="4">4</button>
+    </div>
     <div class="tabs">
       <button data-v="join" class="on">1 · Lobi</button>
       <button data-v="board">2 · Papan Skor</button>
@@ -111,11 +115,6 @@ canvas#cf{position:fixed;inset:0;pointer-events:none;z-index:5}
   </section>
 </div>
 
-<div class="ctl" id="ctl" title="Kontrol narasumber (PIN)">
-  <span>SESI</span>
-  <button data-s="0" title="Kunci semua">🔒</button>
-  <button data-s="1">1</button><button data-s="2">2</button><button data-s="3">3</button><button data-s="4">4</button>
-</div>
 <div class="toast" id="toast"></div>
 
 <script src="logo.js"></script>
@@ -169,7 +168,7 @@ function paint(){
 }
 function poll(){
   if(!CFG.SCRIPT_URL) return;
-  jsonp(CFG.SCRIPT_URL+"?action=top", d=>{ if(d&&d.ok){ DATA=d; paint(); $("#upd").textContent="Diperbarui "+new Date().toLocaleTimeString("id-ID"); } }, ()=>{ $("#upd").textContent="Koneksi terputus, mencoba lagi…"; });
+  jsonp(CFG.SCRIPT_URL+"?action=top", d=>{ if(d&&d.ok){ DATA=d; paint(); if(!("players" in d)) $("#warn").innerHTML='<div class="warn">Skrip Google masih versi lama: tempel Code.gs terbaru lalu Deploy &gt; Manage deployments &gt; New version.</div>'; else if($("#warn").textContent.includes("versi lama")) $("#warn").innerHTML=""; $("#upd").textContent="Diperbarui "+new Date().toLocaleTimeString("id-ID"); } }, ()=>{ $("#upd").textContent="Koneksi terputus, mencoba lagi…"; });
 }
 poll(); setInterval(poll,5000);
 
