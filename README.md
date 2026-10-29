@@ -94,7 +94,6 @@ Untuk mengulang permainan di perangkat yang sama (misalnya setelah uji coba), bu
 ## Pembuat
 
 **Desi Susanti, S.Kom., M.Kom.**
-Dosen Ilmu Komputer, Universitas Global Madani
 
 [LinkedIn](https://linkedin.com/in/desi-susanti-70a7b831a) · [GitHub](https://github.com/des1susanti)
 
