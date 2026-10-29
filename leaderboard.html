@@ -12,14 +12,17 @@
 *{box-sizing:border-box}
 html,body{margin:0;height:100%;background:var(--ink);color:#fff;font-family:"Plus Jakarta Sans",system-ui,sans-serif;overflow:hidden}
 .wrap{height:100vh;display:flex;flex-direction:column;padding:3.5vh 4vw 3.5vh}
-.top{display:flex;align-items:center;justify-content:space-between}
-.brand{display:flex;align-items:center;gap:.8vw;font-weight:800;color:var(--sun);letter-spacing:.2vw;font-size:1.5vw}
-.brand .nn{width:3.2vw;height:3.2vw}
-.tabs{display:flex;gap:.6vw}
-.tabs button{font:inherit;font-weight:800;font-size:1.05vw;padding:.7vw 1.3vw;border-radius:99px;border:2px solid #3A4270;background:transparent;color:#fff;cursor:pointer}
+.top{display:flex;align-items:center;justify-content:space-between;gap:1vw}
+.brand{display:flex;align-items:center;gap:.8vw;min-width:0}
+.brand .nn{width:clamp(30px,2.8vw,52px);height:clamp(30px,2.8vw,52px);flex:0 0 auto}
+.brand .bt{font-weight:800;color:var(--sun);font-size:clamp(14px,1.25vw,24px);letter-spacing:.02em;line-height:1.15;white-space:nowrap}
+.brand .bs{font-weight:600;color:var(--muted);font-size:clamp(10px,.78vw,15px);line-height:1.3;white-space:nowrap}
+.tabs{display:flex;gap:.5vw;flex:0 0 auto}
+.tabs button{font:inherit;font-weight:800;font-size:clamp(11px,.9vw,17px);white-space:nowrap;padding:.55vw 1.1vw;border-radius:99px;border:2px solid #3A4270;background:transparent;color:#fff;cursor:pointer}
 .tabs button.on{background:var(--coral);border-color:var(--coral);color:var(--ink)}
-#snd{font:inherit;font-weight:800;font-size:1.05vw;padding:.7vw 1.1vw;border-radius:99px;border:2px solid #3A4270;background:transparent;color:#fff;cursor:pointer;margin-right:.6vw}
-#snd.on{border-color:var(--sun);color:var(--sun)}
+#snd{width:clamp(28px,2.2vw,40px);height:clamp(28px,2.2vw,40px);flex:0 0 auto;display:grid;place-items:center;font-size:clamp(12px,1vw,18px);line-height:1;padding:0;border-radius:50%;border:1px solid #3A4270;background:transparent;color:#fff;cursor:pointer;opacity:.75}
+#snd:hover{opacity:1}
+#snd.on{border-color:var(--sun);opacity:1}
 .view{flex:1;display:none;min-height:0}
 .view.on{display:flex}
 /* lobi */
@@ -68,9 +71,9 @@ html,body{margin:0;height:100%;background:var(--ink);color:#fff;font-family:"Plu
 canvas#cf{position:fixed;inset:0;pointer-events:none;z-index:5}
 .warn{background:#5A2330;color:#FFD6D8;padding:1vw 1.4vw;border-radius:1vw;font-size:1.2vw;margin-top:2vh}
 /* kontrol narasumber */
-.ctl{display:flex;align-items:center;gap:.4vw;background:var(--ink2);border:1px solid #3A4270;padding:.4vw .6vw;border-radius:99px;margin-left:auto;margin-right:1.2vw}
-.ctl span{font-size:.9vw;font-weight:700;color:var(--muted);margin:0 .3vw}
-.ctl button{font:inherit;font-weight:800;font-size:.95vw;min-width:2.4vw;padding:.4vw .7vw;border-radius:99px;border:1px solid #4A5280;background:transparent;color:#fff;cursor:pointer}
+.ctl{display:flex;align-items:center;gap:.35vw;background:var(--ink2);border:1px solid #3A4270;padding:.35vw .5vw;border-radius:99px;margin-left:auto;flex:0 0 auto}
+.ctl span{white-space:nowrap;font-size:clamp(9px,.72vw,14px);font-weight:700;color:var(--muted);margin:0 .3vw}
+.ctl button{font:inherit;font-weight:800;font-size:clamp(10px,.82vw,15px);min-width:clamp(22px,2vw,36px);padding:.3vw .55vw;border-radius:99px;border:1px solid #4A5280;background:transparent;color:#fff;cursor:pointer}
 .ctl button.on{background:var(--teal);border-color:var(--teal);color:var(--ink)}
 .toast{pointer-events:none;position:fixed;left:50%;bottom:8vh;transform:translateX(-50%);background:var(--teal);color:var(--ink);font-weight:800;font-size:1.4vw;padding:1vw 2vw;border-radius:99px;z-index:7;opacity:0;transition:opacity .3s}
 .toast.show{opacity:1}
@@ -81,13 +84,13 @@ canvas#cf{position:fixed;inset:0;pointer-events:none;z-index:5}
 <canvas id="cf"></canvas>
 <div class="wrap">
   <div class="top">
-    <div class="brand"><span id="mini"></span>LIFE DESIGN QUEST · PAPAN SKOR</div>
+    <div class="brand"><span id="mini"></span><div><div class="bt">Life Design Quest</div><div class="bs">Your Future, Your Plan: Building Your Personal Career Roadmap</div></div></div>
     <div class="ctl" id="ctl" title="Klik angka untuk membuka level sampai nomor itu; klik gembok untuk mengunci semua">
       <span>BUKA LEVEL</span>
       <button data-s="0" title="Kunci semua">🔒</button>
       <button data-s="1">1</button><button data-s="2">2</button><button data-s="3">3</button><button data-s="4">4</button><button data-s="5">5</button><button data-s="6">6</button>
     </div>
-    <button id="snd" title="Musik on/off (tombol M)">🔇 Musik</button>
+    <button id="snd" title="Musik on/off (tombol M)" aria-label="Musik on/off">🔇</button>
     <div class="tabs">
       <button data-v="join" class="on">1 · Lobi</button>
       <button data-v="board">2 · Papan Skor</button>
@@ -144,7 +147,7 @@ const trackFor = v => v==="join"?"lobby":v==="board"?"board":(REVEALED?"victory"
 function show(v){ LDQ_SOUND.setTrack(trackFor(v)); document.querySelectorAll(".view").forEach(x=>x.classList.toggle("on",x.id===v)); document.querySelectorAll(".tabs button").forEach(b=>b.classList.toggle("on",b.dataset.v===v)); }
 document.querySelectorAll(".tabs button").forEach(b=>b.onclick=()=>show(b.dataset.v));
 addEventListener("keydown",e=>{ if(e.target.tagName==="INPUT") return; if(e.key==="1")show("join"); if(e.key==="2")show("board"); if(e.key==="3")show("podium"); if(e.key==="m"||e.key==="M") $("#snd").click(); });
-$("#snd").onclick=()=>{ const on=LDQ_SOUND.toggle(); $("#snd").classList.toggle("on",on); $("#snd").textContent=on?"🔊 Musik":"🔇 Musik"; };
+$("#snd").onclick=()=>{ const on=LDQ_SOUND.toggle(); $("#snd").classList.toggle("on",on); $("#snd").textContent=on?"🔊":"🔇"; };
 
 // QR
 $("#url").textContent = GAME.replace(/^https?:\/\//,"");
