@@ -28,14 +28,7 @@ Game ini dibuat agar latihan-latihan dari buku tersebut terasa seperti permainan
 | 5 | 🚀 Odyssey Builder | Menulis Plan A, B, C untuk 5 tahun ke depan dan menilai antusiasme | 50 (selesai) |
 | 6 | 👑 Boss: Selamatkan Salsa! | Cerita bercabang 4 babak tentang mahasiswa yang hampir menyerah | s.d. 400 |
 
-Level dibuka bertahap dalam 4 sesi oleh narasumber, mengikuti urutan materi:
-
-| Sesi | Dibuka setelah materi | Level |
-|---|---|---|
-| 1 | Pembuka + Bab 1 (Mulai dari posisi sekarang) | 1, 2, 3 |
-| 2 | Bab 2 (Membangun kompas) | 4 |
-| 3 | Bab 3 (Mencari jalan / Odyssey Plan) | 5 |
-| 4 | Bab 4–5 (Prototipe, memilih & melangkah) | 6 (Boss) |
+Level dibuka satu per satu oleh narasumber setelah materi terkait selesai dijelaskan (tombol 1–6 di papan skor).
 
 - **Skor maksimum:** 2.800 poin.
 - Jawaban benar bernilai 100 poin, ditambah bonus kecepatan hingga 50 poin.
@@ -48,7 +41,7 @@ Level dibuka bertahap dalam 4 sesi oleh narasumber, mengikuti urutan materi:
 - 🧭 **Animasi pembuka:** logo kompas yang tersusun dari jaringan neuron, dirakit dan jarumnya berayun selama ±5 detik.
 - 🧑‍🎓 **10 karakter pixel:** 5 laki-laki dan 5 perempuan (3 berhijab) yang dipilih setelah mengisi data; karakter melompat saat jawaban benar dan tercetak di sertifikat.
 - 🏫 **Lobi kampus ala ZEP:** di layar proyektor, karakter mahasiswa keluar dari gedung Perguruan Tinggi Al-Madani versi pixel lalu berjalan-jalan dengan nama dan level di atas kepala.
-- 🔓 **Level per sesi:** narasumber membuka sesi dari layar papan skor (dilindungi PIN); level di HP mahasiswa terbuka otomatis.
+- 🔓 **Level dibuka bertahap:** narasumber mengklik tombol 1–6 di layar papan skor; level di HP mahasiswa terbuka otomatis.
 - 📱 **Mobile-first:** dirancang untuk layar HP, tanpa perlu instal aplikasi atau login.
 - 💾 **Progres tersimpan:** jika halaman ter-refresh, permainan berlanjut dari posisi terakhir.
 - 🏆 **Papan skor live:** 10 besar diperbarui otomatis setiap 5 detik, dengan tampilan QR untuk bergabung dan animasi podium juara.
@@ -94,7 +87,7 @@ Skrip Google Apps Script (`Code.gs`) dipasang terpisah di Google Sheets dan tida
 2. Buat Google Sheet baru, buka **Extensions > Apps Script**, tempel skrip `Code.gs`, lalu **Deploy > New deployment > Web app** (Execute as: Me, Who has access: Anyone).
 3. Tempel URL Web app (berakhiran `/exec`) ke `SCRIPT_URL` di `config.js`, lalu sesuaikan nama acara, tanggal, dan narasumber.
 4. Aktifkan **Settings > Pages** (branch `main`, folder root).
-5. Buka `leaderboard.html` di proyektor. Pintasan keyboard: `1` Lobi, `2` Papan Skor, `3` Juara. Tombol **SESI 🔒 1 2 3 4** di pojok kanan bawah untuk membuka level (PIN diatur di `Code.gs`).
+5. Buka `leaderboard.html` di proyektor. Pintasan keyboard: `1` Lobi, `2` Papan Skor, `3` Juara. Tombol **BUKA LEVEL 🔒 1–6** di bar atas untuk membuka atau mengunci level.
 
 Untuk mengulang permainan di perangkat yang sama (misalnya setelah uji coba), buka alamat game dengan tambahan `?reset=1`.
 

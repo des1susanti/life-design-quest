@@ -160,8 +160,8 @@ const BOSS = [
    o:[["Pakai logika dan intuisi untuk memilih, lalu jalani sepenuhnya tanpa terus menoleh ke belakang.",100,"Inilah langkah ‘Let go & move on’. Pilihan yang baik dijalani sepenuh hati."],["Tunggu dulu, siapa tahu ada tawaran ketiga yang lebih baik.",30,"Menunda terus bisa membuat kedua kesempatan hilang."],["Terima dua-duanya diam-diam.",0,"Ini merusak kepercayaan dan reputasi Salsa sejak awal."]]},
 ];
 const T_GRAV = 8, T_REF = 15; // detik
-const STAGE_OF = {l1:1,l2:1,l3:1,l4:2,l5:3,boss:4};
-const STAGE_NAME = {1:"Sesi 1",2:"Sesi 2",3:"Sesi 3",4:"Sesi 4"};
+const STAGE_OF = {l1:1,l2:2,l3:3,l4:4,l5:5,boss:6};
+const STAGE_NAME = {1:"Level 1",2:"Level 2",3:"Level 3",4:"Level 4",5:"Level 5",6:"Boss Level"};
 
 // ---------------- STATE ----------------
 let S = load() || fresh();
@@ -248,16 +248,16 @@ AFTER.pick = () => {
 };
 
 function nextLevel(){ return LEVELS.find(l=>!S.done[l.id]); }
-const curStage = () => CFG.SCRIPT_URL ? (S.stage||0) : 4;
+const curStage = () => CFG.SCRIPT_URL ? (S.stage||0) : 6;
 const isOpen = l => STAGE_OF[l.id] <= curStage();
 function map(){
   const nx = nextLevel();
-  return `${CFG.SCRIPT_URL?`<span class="stagepill">● ${curStage()?STAGE_NAME[curStage()]+" dibuka":"Menunggu Sesi 1 dibuka"}</span>`:""}<div class="hero" id="hero"></div><h2>Hai, ${esc(S.nama.split(" ")[0])}! 👋</h2>
+  return `${CFG.SCRIPT_URL?`<span class="stagepill">● ${curStage()?(curStage()>=6?"Semua level dibuka":"Level 1–"+curStage()+" dibuka"):"Menunggu narasumber membuka Level 1"}</span>`:""}<div class="hero" id="hero"></div><h2>Hai, ${esc(S.nama.split(" ")[0])}! 👋</h2>
   <p>${nx?"Selesaikan level secara berurutan.":"Semua level selesai! Saatnya klaim hasilmu."}</p>
   <div class="path">${LEVELS.map(l=>{
     const open = isOpen(l);
     const st = S.done[l.id]?"done":(nx&&nx.id===l.id&&open?"cur":"lock");
-    return `<div class="node ${st}"><div class="badge" style="background:${l.c}">${S.done[l.id]?"✓":(open?l.ic:"🔒")}</div><div><div class="t">${l.n}. ${l.t}</div><div class="s">${open||S.done[l.id]?l.s:"Dibuka di "+STAGE_NAME[STAGE_OF[l.id]]}</div></div>${S.done[l.id]?`<div class="r">+${S.pts[l.id]||0}</div>`:""}</div>`;
+    return `<div class="node ${st}"><div class="badge" style="background:${l.c}">${S.done[l.id]?"✓":(open?l.ic:"🔒")}</div><div><div class="t">${l.n}. ${l.t}</div><div class="s">${open||S.done[l.id]?l.s:"Terkunci · menunggu narasumber"}</div></div>${S.done[l.id]?`<div class="r">+${S.pts[l.id]||0}</div>`:""}</div>`;
   }).join("")}</div>
   ${nx && !isOpen(nx) ? `<div class="lockmsg">🔒 Tunggu narasumber membuka ${STAGE_NAME[STAGE_OF[nx.id]]}<small>Simak penjelasan berikutnya. Level akan terbuka otomatis di layar ini.</small></div>`
     : `<button class="btn" id="go">${nx?`Main Level ${nx.n} →`:"Lihat hasil & sertifikat →"}</button>`}`;

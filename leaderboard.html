@@ -79,10 +79,10 @@ canvas#cf{position:fixed;inset:0;pointer-events:none;z-index:5}
 <div class="wrap">
   <div class="top">
     <div class="brand"><span id="mini"></span>LIFE DESIGN QUEST · PAPAN SKOR</div>
-    <div class="ctl" id="ctl" title="Kontrol narasumber (PIN)">
-      <span>BUKA SESI</span>
+    <div class="ctl" id="ctl" title="Klik angka untuk membuka level sampai nomor itu; klik gembok untuk mengunci semua">
+      <span>BUKA LEVEL</span>
       <button data-s="0" title="Kunci semua">🔒</button>
-      <button data-s="1">1</button><button data-s="2">2</button><button data-s="3">3</button><button data-s="4">4</button>
+      <button data-s="1">1</button><button data-s="2">2</button><button data-s="3">3</button><button data-s="4">4</button><button data-s="5">5</button><button data-s="6">6</button>
     </div>
     <div class="tabs">
       <button data-v="join" class="on">1 · Lobi</button>
@@ -127,7 +127,7 @@ const $ = s => document.querySelector(s);
 const esc = s => String(s==null?"":s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const qp = new URLSearchParams(location.search);
 const GAME = qp.get("game") || location.href.split("?")[0].split("#")[0].replace(/leaderboard\.html$/,"");
-const STAGE_TXT = {0:"Menunggu Sesi 1 dibuka",1:"Sesi 1 dibuka · Level 1–3",2:"Sesi 2 dibuka · Level 4 Kompas",3:"Sesi 3 dibuka · Level 5 Odyssey",4:"Sesi 4 dibuka · Boss Level"};
+const STAGE_TXT = {0:"🔒 Semua level terkunci",1:"🔓 Level 1 dibuka",2:"🔓 Level 1–2 dibuka",3:"🔓 Level 1–3 dibuka",4:"🔓 Level 1–4 dibuka",5:"🔓 Level 1–5 dibuka",6:"🔓 Semua level dibuka"};
 let DATA = {top:[],total:0,finished:0,stage:0};
 
 $("#mini").innerHTML = nnLogo(false);
@@ -156,7 +156,7 @@ function jsonp(url, cb, fail){
 const short = n => { const p=String(n).trim().split(/\s+/); return p.length>2? p.slice(0,2).join(" ")+" "+p[2][0]+"." : p.join(" "); };
 function paintStage(st){
   $("#stageNow").textContent = STAGE_TXT[st]||STAGE_TXT[0];
-  document.querySelectorAll(".ctl button").forEach(b=>b.classList.toggle("on",+b.dataset.s===st));
+  document.querySelectorAll(".ctl button").forEach(b=>{ const n=+b.dataset.s; b.classList.toggle("on", st===0 ? n===0 : (n>0 && n<=st)); });
 }
 function paint(){
   const t=DATA.top||[];
@@ -176,12 +176,11 @@ poll(); setInterval(poll,5000);
 function toast(msg,bad){ const t=$("#toast"); t.textContent=msg; t.className="toast show"+(bad?" bad":""); clearTimeout(t._h); t._h=setTimeout(()=>t.className="toast",2600); }
 document.querySelectorAll(".ctl button").forEach(b=>b.onclick=()=>{
   if(!CFG.SCRIPT_URL) return toast("SCRIPT_URL belum diisi",true);
-  let pin=null; try{ pin=sessionStorage.getItem("ldq_pin"); }catch(e){}
-  if(!pin){ pin=prompt("PIN narasumber:"); if(!pin) return; }
   const st=+b.dataset.s;
-  jsonp(CFG.SCRIPT_URL+"?action=setStage&stage="+st+"&pin="+encodeURIComponent(pin), r=>{
-    if(r&&r.ok){ try{ sessionStorage.setItem("ldq_pin",pin); }catch(e){} DATA.stage=r.stage; paintStage(r.stage); toast(r.stage?`🔓 ${STAGE_TXT[r.stage]}`:"🔒 Semua level dikunci"); }
-    else { try{ sessionStorage.removeItem("ldq_pin"); }catch(e){} toast((r&&r.error)||"Gagal mengubah sesi",true); }
+  paintStage(st); // langsung terlihat, lalu dikonfirmasi server
+  jsonp(CFG.SCRIPT_URL+"?action=setStage&stage="+st, r=>{
+    if(r&&r.ok&&r.stage===st){ DATA.stage=r.stage; paintStage(r.stage); toast(STAGE_TXT[r.stage]); }
+    else { paintStage(DATA.stage||0); toast(r&&r.ok?"Skrip Google belum versi terbaru (maks. 6 level)":((r&&r.error)||"Gagal mengubah level"),true); }
   }, ()=>toast("Koneksi gagal, coba lagi",true));
 });
 
