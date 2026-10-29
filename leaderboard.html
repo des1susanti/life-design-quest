@@ -1,0 +1,157 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Papan Skor · Life Design Quest</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<style>
+:root{--ink:#141B34;--ink2:#232B52;--coral:#FF6B4A;--sun:#FFC94D;--teal:#2EC4B6;--blue:#4D7CFE;--purple:#9B5DE5;--muted:#B8BDD6}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;background:var(--ink);color:#fff;font-family:"Plus Jakarta Sans",system-ui,sans-serif;overflow:hidden}
+.wrap{height:100vh;display:flex;flex-direction:column;padding:3.5vh 4vw}
+.top{display:flex;align-items:center;justify-content:space-between}
+.brand{font-weight:800;color:var(--sun);letter-spacing:.2vw;font-size:1.6vw}
+.tabs{display:flex;gap:.6vw}
+.tabs button{font:inherit;font-weight:800;font-size:1.05vw;padding:.7vw 1.3vw;border-radius:99px;border:2px solid #3A4270;background:transparent;color:#fff;cursor:pointer}
+.tabs button.on{background:var(--coral);border-color:var(--coral);color:var(--ink)}
+.view{flex:1;display:none;min-height:0}
+.view.on{display:flex}
+/* join */
+#join{align-items:center;gap:5vw}
+#join .l{flex:1}
+#join h1{font-size:5.2vw;line-height:1.05;margin:0 0 2vh;font-weight:800}
+#join h1 span{color:var(--coral)}
+#join p{font-size:1.7vw;color:var(--muted);margin:0 0 3vh;line-height:1.4}
+.url{display:inline-block;background:var(--ink2);padding:1vw 1.6vw;border-radius:1vw;font-size:1.6vw;font-weight:700;color:var(--teal)}
+.qrbox{background:#fff;padding:2vw;border-radius:2vw;box-shadow:0 2vw 5vw rgba(0,0,0,.4)}
+#qr img,#qr canvas{width:30vw!important;height:30vw!important;max-width:58vh;max-height:58vh;display:block}
+.count{margin-top:3vh;font-size:1.6vw;font-weight:700}
+.count b{color:var(--sun);font-size:2.4vw}
+/* board */
+#board{flex-direction:column;padding-top:2vh}
+#board h2{font-size:2.6vw;margin:0 0 2vh;font-weight:800}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:1.2vh 2vw;flex:1;align-content:start}
+.row{display:flex;align-items:center;gap:1.2vw;background:var(--ink2);border-radius:1.2vw;padding:1.3vh 1.4vw;transition:transform .4s}
+.rk{width:3.6vw;height:3.6vw;border-radius:50%;display:grid;place-items:center;font-weight:800;font-size:1.6vw;color:var(--ink);background:#3A4270;flex:0 0 auto}
+.r1 .rk{background:var(--sun)}.r2 .rk{background:#D7DAE8}.r3 .rk{background:#E8A27C}
+.nm{font-weight:800;font-size:1.65vw;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pr{font-size:1.05vw;color:var(--muted);font-weight:600}
+.sc{margin-left:auto;font-weight:800;font-size:2vw;color:var(--sun)}
+.empty{font-size:1.8vw;color:var(--muted)}
+.foot{display:flex;justify-content:space-between;color:var(--muted);font-size:1.05vw;margin-top:1.5vh}
+.prog{height:1vh;background:var(--ink2);border-radius:1vh;overflow:hidden;margin-top:1vh}
+.prog i{display:block;height:100%;background:var(--teal);transition:width .6s}
+/* podium */
+#podium{flex-direction:column;align-items:center;justify-content:flex-end;position:relative}
+#podium h2{font-size:3.4vw;margin:0 0 4vh;font-weight:800;text-align:center}
+.pods{display:flex;align-items:flex-end;gap:2vw}
+.pod{width:22vw;text-align:center;opacity:0;transform:translateY(6vh);transition:all .8s cubic-bezier(.2,.9,.3,1.2)}
+.pod.show{opacity:1;transform:none}
+.pod .who{font-weight:800;font-size:2vw;margin-bottom:.5vh;padding:0 .5vw}
+.pod .ps{color:var(--muted);font-size:1.2vw;margin-bottom:1.5vh}
+.pod .blk{border-radius:1.5vw 1.5vw 0 0;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;padding-top:2vh;color:var(--ink)}
+.pod .blk .n{font-size:6vw;font-weight:800;line-height:1}
+.pod .blk .s{font-size:1.8vw;font-weight:800}
+#reveal{font:inherit;font-weight:800;font-size:1.4vw;padding:1vw 2.2vw;border-radius:99px;border:0;background:var(--coral);color:var(--ink);cursor:pointer;margin-top:3vh}
+canvas#cf{position:fixed;inset:0;pointer-events:none;z-index:5}
+.warn{background:#5A2330;color:#FFD6D8;padding:1vw 1.4vw;border-radius:1vw;font-size:1.2vw;margin-top:2vh}
+</style>
+</head>
+<body>
+<canvas id="cf"></canvas>
+<div class="wrap">
+  <div class="top">
+    <div class="brand">LIFE DESIGN QUEST · PAPAN SKOR</div>
+    <div class="tabs">
+      <button data-v="join" class="on">1 · Scan QR</button>
+      <button data-v="board">2 · Papan Skor</button>
+      <button data-v="podium">3 · Juara 🏆</button>
+    </div>
+  </div>
+
+  <section class="view on" id="join">
+    <div class="l">
+      <h1>Scan, main,<br><span>raih sertifikatmu!</span></h1>
+      <p>Buka kamera HP, scan kode QR, lalu selesaikan 6 level Life Design Quest. Nama terbaik akan muncul di layar ini.</p>
+      <div class="url" id="url"></div>
+      <div class="count">Sudah selesai: <b id="cnt1">0</b> peserta</div>
+      <div id="warn"></div>
+    </div>
+    <div class="qrbox"><div id="qr"></div></div>
+  </section>
+
+  <section class="view" id="board">
+    <h2>🔥 10 Life Designer Teratas</h2>
+    <div class="grid" id="grid"><div class="empty">Menunggu peserta pertama menyelesaikan quest…</div></div>
+    <div class="prog"><i id="pbar" style="width:0%"></i></div>
+    <div class="foot"><span id="cnt2">0 peserta selesai</span><span id="upd">Memperbarui otomatis setiap 5 detik</span></div>
+  </section>
+
+  <section class="view" id="podium">
+    <h2>Selamat kepada para juara! 🎉</h2>
+    <div class="pods" id="pods"></div>
+    <button id="reveal">Umumkan juara</button>
+  </section>
+</div>
+
+<script src="config.js"></script>
+<script>
+const CFG = Object.assign({SCRIPT_URL:"",EXPECTED:45}, window.LDQ_CONFIG||{});
+const $ = s => document.querySelector(s);
+const esc = s => String(s==null?"":s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const qp = new URLSearchParams(location.search);
+const GAME = qp.get("game") || location.href.split("?")[0].split("#")[0].replace(/leaderboard\.html$/,"") ;
+let DATA = {top:[],total:0};
+
+// tabs (+ shortcut keyboard 1/2/3)
+function show(v){ document.querySelectorAll(".view").forEach(x=>x.classList.toggle("on",x.id===v)); document.querySelectorAll(".tabs button").forEach(b=>b.classList.toggle("on",b.dataset.v===v)); }
+document.querySelectorAll(".tabs button").forEach(b=>b.onclick=()=>show(b.dataset.v));
+addEventListener("keydown",e=>{ if(e.key==="1")show("join"); if(e.key==="2")show("board"); if(e.key==="3")show("podium"); });
+
+// QR
+$("#url").textContent = GAME.replace(/^https?:\/\//,"");
+try{ new QRCode($("#qr"),{text:GAME,width:600,height:600,colorDark:"#141B34",colorLight:"#ffffff",correctLevel:QRCode.CorrectLevel.M}); }
+catch(e){ const im=new Image(); im.alt="QR ke game"; im.src="https://api.qrserver.com/v1/create-qr-code/?size=600x600&margin=0&data="+encodeURIComponent(GAME); $("#qr").appendChild(im); }
+if(!CFG.SCRIPT_URL) $("#warn").innerHTML='<div class="warn">SCRIPT_URL di config.js belum diisi, jadi papan skor belum terhubung ke Google Sheets.</div>';
+
+// data
+function jsonp(url, cb, fail){
+  const name="lbcb"+Date.now(); const s=document.createElement("script"); let done=false;
+  window[name]=d=>{ done=true; cb(d); s.remove(); delete window[name]; };
+  s.onerror=()=>{ if(!done){ fail&&fail(); s.remove(); } };
+  setTimeout(()=>{ if(!done){ fail&&fail(); s.remove(); } },10000);
+  s.src=url+(url.includes("?")?"&":"?")+"callback="+name; document.body.appendChild(s);
+}
+const short = n => { const p=String(n).trim().split(/\s+/); return p.length>2? p.slice(0,2).join(" ")+" "+p[2][0]+"." : p.join(" "); };
+function paint(){
+  const t=DATA.top||[];
+  $("#cnt1").textContent=DATA.total; $("#cnt2").textContent=`${DATA.total} dari ±${CFG.EXPECTED} peserta selesai`;
+  $("#pbar").style.width=Math.min(100,DATA.total/CFG.EXPECTED*100)+"%";
+  $("#grid").innerHTML = t.length ? t.map((r,i)=>`<div class="row r${i+1}" style="grid-column:${i<5?1:2};grid-row:${(i%5)+1}"><div class="rk">${i+1}</div><div style="min-width:0"><div class="nm">${esc(short(r.nama))}</div><div class="pr">${esc(r.prodi)} · ${Math.floor(r.durasi/60)}m ${r.durasi%60}d</div></div><div class="sc">${r.skor}</div></div>`).join("") : '<div class="empty">Menunggu peserta pertama menyelesaikan quest…</div>';
+}
+function poll(){
+  if(!CFG.SCRIPT_URL) return;
+  jsonp(CFG.SCRIPT_URL+"?action=top", d=>{ if(d&&d.ok){ DATA=d; paint(); $("#upd").textContent="Diperbarui "+new Date().toLocaleTimeString("id-ID"); } }, ()=>{ $("#upd").textContent="Koneksi terputus, mencoba lagi…"; });
+}
+poll(); setInterval(poll,5000);
+
+// podium
+$("#reveal").onclick=()=>{
+  const t=(DATA.top||[]).slice(0,3); if(!t.length){ $("#pods").innerHTML='<div class="empty">Belum ada peserta.</div>'; return; }
+  const order=[1,0,2], h=["38vh","28vh","20vh"], c=["#FFC94D","#D7DAE8","#E8A27C"];
+  $("#pods").innerHTML = order.filter(i=>t[i]).map(i=>`<div class="pod" data-i="${i}"><div class="who">${esc(short(t[i].nama))}</div><div class="ps">${esc(t[i].prodi)}</div><div class="blk" style="height:${h[i]};background:${c[i]}"><div class="n">${i+1}</div><div class="s">${t[i].skor} poin</div></div></div>`).join("");
+  $("#reveal").style.display="none";
+  [2,1,0].forEach((i,k)=>setTimeout(()=>{ const p=document.querySelector(`.pod[data-i="${i}"]`); if(p) p.classList.add("show"); if(i===0) confetti(); },600+k*1300));
+};
+function confetti(){
+  const cv=$("#cf"), x=cv.getContext("2d"); cv.width=innerWidth; cv.height=innerHeight;
+  const cs=["#FF6B4A","#FFC94D","#2EC4B6","#4D7CFE","#9B5DE5","#fff"];
+  const P=Array.from({length:260},()=>({x:Math.random()*cv.width,y:-Math.random()*cv.height,s:6+Math.random()*8,v:2+Math.random()*4,r:Math.random()*6,dr:(Math.random()-.5)*.2,dx:(Math.random()-.5)*2,c:cs[Math.floor(Math.random()*6)]}));
+  let t=0; (function f(){ x.clearRect(0,0,cv.width,cv.height); P.forEach(p=>{ p.y+=p.v; p.x+=p.dx; p.r+=p.dr; x.save(); x.translate(p.x,p.y); x.rotate(p.r); x.fillStyle=p.c; x.fillRect(-p.s/2,-p.s/4,p.s,p.s/2); x.restore(); }); if(++t<420) requestAnimationFrame(f); else x.clearRect(0,0,cv.width,cv.height); })();
+}
+</script>
+</body>
+</html>
